@@ -26,13 +26,13 @@ for mower in mower_names:
     mower_text = re.sub('landroid_','landroid_{0}_'.format(mower), mower_text)
     mower_text = re.sub('landroid_{0}_cloud'.format(mower),'landroid_cloud', mower_text)
     mower_text = re.sub('alias: Landroid','alias: Landroid {0}'.format(mower), mower_text)
-    #remove secrets for now, they will disapear in the future with upgrades from landroid cloud
+    # remove secrets for now, they will disapear in the future with upgrades from landroid cloud
     mower_text = re.sub('!secret landroid_.*','""', mower_text)
     # fix German to default English
     mower_text = re.sub('Lädt','Charging', mower_text)
     mower_text = re.sub('Entlädt','Discharging', mower_text)
     yamlList.append("## Landroid mower {0} ##\r\n{1}".format(mower, mower_text))
-    # add mower name and id
+    # add mower name and id sensor
     yamlList.append("""
 recorder:
   exclude:
@@ -80,7 +80,7 @@ for mower in mower_names:
       if 'card' in item and 'entities' in item['card'] and 'entities' in item['card']['entities'][0]:
         item['card']['entities'][0]['entities'].insert(0, OrderedDict([('entity', 'sensor.landroid_{0}_name'.format(mower))]))
         item['card']['entities'][0]['entities'].insert(1, OrderedDict([('entity', 'sensor.landroid_{0}_id'.format(mower))]))
-    # if you have multiple mowers, add mower name at the top of the card
+    # if you have multiple mowers listed, add mower name at the top of the card
     if len(mower_names) > 1:
         yaml_card['cards'][0]['elements'].append(hiyapyco.load("""
   entity: sensor.landroid_{0}_name
