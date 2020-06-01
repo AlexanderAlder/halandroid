@@ -1,6 +1,7 @@
-# pip install HiYaPyCo
-import re
+# needs pip install HiYaPyCo
 import hiyapyco
+import re
+from collections import OrderedDict
 
 # describe your mower names
 mower_names = ['vanvoor','vanachter']
@@ -69,16 +70,29 @@ lovelace_file_text = lovelace_file.read()
 ## generate mower cards
 for mower in mower_names:
     target_lovelace_file_path = "lovelace/card_{0}.yaml".format(mower)
-    target_lovelace_file = open(target_lovelace_file_path,'w', encoding="utf8")
     mower_text = lovelace_file_text
     mower_text = re.sub('_mower_','_', mower_text)
     mower_text = re.sub('landroid_','landroid_{0}_'.format(mower), mower_text)
     mower_text = re.sub(r'landroid_{0}(.*).png'.format(mower),r'landroid\1.png', mower_text)
-    yaml_card = hiyapyco.load(mower_text)
-    print(str(yaml_card))
-    # TODO: if more then 1 mower nam, add mower name to card
-    #if len(mower_names) > 1:
-
-    target_package_file.write(hiyapyco.dump(yaml_card))
-
+    yaml_card = hiyapyco.load(mower_text, method=hiyapyco.METHOD_SIMPLE)
+    # add name, id to info
+    for item in yaml_card['cards']:
+      if 'card' in item and 'entities' in item['card'] and 'entities' in item['card']['entities'][0]:
+        item['card']['entities'][0]['entities'].insert(0, OrderedDict([('entity', 'sensor.landroid_{0}_name'.format(mower))]))
+        item['card']['entities'][0]['entities'].insert(1, OrderedDict([('entity', 'sensor.landroid_{0}_id'.format(mower))]))
+    # if you have multiple mowers, add mower name at the top of the card
+    if len(mower_names) > 1:
+        yaml_card['cards'][0]['elements'].append(hiyapyco.load("""
+  entity: sensor.landroid_{0}_name
+  style:
+    color: 'rgb(3, 169, 244)'
+    font-size: 200%
+    font-weight: bold
+    left: 50%
+    top: 1%
+    transform: translate(-50%, 0%)
+  type: state-label""".format(mower)))
+    target_lovelace_file = open(target_lovelace_file_path,'w', encoding="utf8")
+    target_lovelace_file.write(hiyapyco.dump(yaml_card))
+    target_lovelace_file.close()
 
