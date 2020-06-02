@@ -49,10 +49,10 @@ sensor:
   sensors:
     landroid_{0}_name:
       friendly_name: Mower name
-      value_template: "{{ state_attr('sensor.landroid_{0}_status', 'friendly_name')[:-7] }}"
-    landroid_id:
+      value_template: "{{{{ state_attr('sensor.landroid_{0}_status', 'friendly_name')[:-7] }}}}"
+    landroid_{0}_id:
       friendly_name: Mower id number
-      value_template: "{{ state_attr('sensor.landroid_{0}_status', 'id') }}"
+      value_template: "{{{{ state_attr('sensor.landroid_{0}_status', 'id') }}}}"
       icon_template: mdi:numeric
     """.format(mower))
 
