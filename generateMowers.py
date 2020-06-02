@@ -20,6 +20,7 @@ package_file_header = package_file_text[:package_file_content_index]
 package_file_content = package_file_text[package_file_content_index:]
 ## write file with all mowers
 yamlList = []
+automations = []
 for mower in mower_names:
     mower_text = package_file_content
     mower_text = re.sub('_mower_','_', mower_text)
@@ -31,7 +32,10 @@ for mower in mower_names:
     # fix German to default English
     mower_text = re.sub('Lädt','Charging', mower_text)
     mower_text = re.sub('Entlädt','Discharging', mower_text)
-    yamlList.append("## Landroid mower {0} ##\r\n{1}".format(mower, mower_text))
+    # hack: the automations don't merge..??
+    automations += hiyapyco.load(mower_text, method=hiyapyco.METHOD_SIMPLE)['automation']
+
+    yamlList.append(mower_text)
     # add mower name and id sensor
     yamlList.append("""
 recorder:
@@ -57,6 +61,7 @@ sensor:
     """.format(mower))
 
 merged_yaml = hiyapyco.load(yamlList, method=hiyapyco.METHOD_MERGE)
+merged_yaml['automation'] = automations
 target_package_file = open(target_package_file_path, 'w', encoding="utf8")
 target_package_file.write(package_file_header)
 target_package_file.write(hiyapyco.dump(merged_yaml))
