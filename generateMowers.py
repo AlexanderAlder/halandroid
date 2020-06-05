@@ -29,9 +29,6 @@ for mower in mower_names:
     mower_text = re.sub('alias: Landroid','alias: Landroid {0}'.format(mower), mower_text)
     # remove secrets for now, they will disapear in the future with upgrades from landroid cloud
     mower_text = re.sub('!secret landroid_.*','""', mower_text)
-    # fix German to default English
-    mower_text = re.sub('Lädt','Charging', mower_text)
-    mower_text = re.sub('Entlädt','Discharging', mower_text)
     # hack: the automations don't merge..??
     automations += hiyapyco.load(mower_text, method=hiyapyco.METHOD_SIMPLE)['automation']
 
